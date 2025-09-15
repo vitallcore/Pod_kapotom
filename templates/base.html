@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Под Капотом - Реальные отзывы на автосервисы</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="/">Под Капотом</a>
+      <nav class="nav">
+        <a href="/">Главная</a>
+        <a href="/services">Автосервисы</a>
+        <a href="/about">О нас</a>
+      </nav>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="searchInput" type="text" placeholder="Поиск автосервисов..." style="padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);min-width:200px;" />
+        <button id="openFeedback" class="btn primary">Оставить отзыв</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© 2025 Под Капотом</div>
+  </footer>
+
+  <!-- Floating feedback modal -->
+  <div id="feedbackModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">Поделись своим отзывом</h3>
+        <button id="closeFeedback" class="btn icon" aria-label="Close">×</button>
+      </div>
+      <form method="post" action="/feedback" class="modal-body">
+        <label class="field">
+          <span>Автосервис</span>
+          <select name="service_id" required>
+            {% for s in services %}
+              <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span>Ваше имя (опционально)</span>
+          <input name="author" type="text" placeholder="Анонимный" />
+        </label>
+        <label class="field">
+          <span>Оценка (звезды)</span>
+          <select name="rating" required>
+            <option value="1">⭐ (1 звезда)</option>
+            <option value="2">⭐⭐ (2 звезды)</option>
+            <option value="3" selected>⭐⭐⭐ (3 звезды)</option>
+            <option value="4">⭐⭐⭐⭐ (4 звезды)</option>
+            <option value="5">⭐⭐⭐⭐⭐ (5 звезд)</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Ваш отзыв</span>
+          <textarea name="content" rows="5" required placeholder="Расскажи о своем опыте обращения в автосервис..."></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Отправить</button>
+          <button type="button" id="cancelFeedback" class="btn">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  
+</body>
+</html>
+
+

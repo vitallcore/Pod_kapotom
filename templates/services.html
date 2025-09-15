@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <h1>Все автосервисы в твоем городе</h1>
+  
+  <!-- Filters -->
+  <div class="card" style="margin-bottom:16px;padding:16px;">
+    <form method="get" action="/services" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <input name="search" type="text" placeholder="Поиск по названию..." value="{{ search or '' }}" style="flex:1;min-width:200px;" />
+      <select name="min_rating" style="min-width:120px;">
+        <option value="">Любой рейтинг</option>
+        <option value="4" {% if min_rating == 4 %}selected{% endif %}>4+ звезд</option>
+        <option value="3" {% if min_rating == 3 %}selected{% endif %}>3+ звезд</option>
+        <option value="2" {% if min_rating == 2 %}selected{% endif %}>2+ звезд</option>
+      </select>
+      <button type="submit" class="btn primary">Фильтр</button>
+      <a href="/services" class="btn">Сбросить</a>
+    </form>
+  </div>
+
+  {% if services|length == 0 %}
+    <p class="muted">Нет автосервисов. Администратор может добавить их.</p>
+  {% else %}
+  <ul class="list">
+    {% for s in services %}
+      <li class="list-item">
+        <div style="flex:1;">
+          <h3><a href="/services/{{ s.id }}">{{ s.name }}</a></h3>
+          <p>{{ s.description }}</p>
+          <div style="margin-top:8px;font-size:14px;color:var(--muted);">
+            ⭐ {{ "%.1f"|format(s.avg_rating) }} ({{ s.review_count }} отзывов)
+          </div>
+        </div>
+        <a class="btn" href="/services/{{ s.id }}">Читать отзывы</a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endblock %}
+
+

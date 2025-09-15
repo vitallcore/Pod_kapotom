@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Будьте честны и рассказывайте всё как есть</h1>
+  <p>
+    Здесь вы можете делиться опытом своих обращений в автосервисы,
+    тем самым помочь другим людям заранее узнать правду о них.
+    Без фальшивых отзывов.
+    Поможем друг другу выбрать самый достойный вариант.
+  </p>
+  <button id="openFeedback2" class="btn primary">Поделиться отзывом</button>
+  <p class="hint">Выберите автосервис в форме и напишите свою честную историю.</p>
+  {% if top_services|length == 0 %}
+    <p class="muted">Нет автосервисов с отзывами. Администратор может добавить их.</p>
+  {% else %}
+  <div class="home-services">
+    <h2>Лучшие автосервисы (по рейтингу)</h2>
+    <ul class="grid">
+      {% for s in top_services %}
+        <li class="card">
+          <h3><a href="/services/{{ s.id }}">{{ s.name }}</a></h3>
+          <p>{{ s.description }}</p>
+          <div style="margin-top:8px;font-size:14px;color:var(--muted);">
+            ⭐ {{ "%.1f"|format(s.avg_rating) }} ({{ s.review_count }} отзывов)
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <h1>{{ service.name }}</h1>
+  <p class="muted">{{ service.description }}</p>
+
+  <div class="actions">
+    <button id="openFeedback3" class="btn primary">Оставить отзыв для {{ service.name }}</button>
+  </div>
+
+  <h2>Отзывы</h2>
+  {% if feedback|length == 0 %}
+    <p>Нет отзывов. Будьте первым, кто поделится своей правдивой историей.</p>
+  {% else %}
+    <ul class="feedback-list">
+      {% for f in feedback %}
+        <li class="feedback-item">
+          <div class="feedback-meta">
+            <span class="author">{{ f.author }}</span>
+            <span class="rating">⭐ {{ f.rating }}/5</span>
+            <time class="date">{{ f.created_at }}</time>
+          </div>
+          <p class="content">{{ f.content }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</article>
+{% endblock %}
+
+

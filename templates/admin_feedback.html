@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h1>Модерация отзывов</h1>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn" href="/admin/services">Назад к сервисам</a>
+      <form method="post" action="/admin/logout">
+        <button class="btn" type="submit">Выйти</button>
+      </form>
+    </div>
+  </div>
+
+  {% if feedback|length == 0 %}
+    <p class="muted">Пока отзывов нет.</p>
+  {% else %}
+    <ul class="list">
+    {% for f in feedback %}
+      <li class="list-item" style="align-items:flex-start;">
+        <div style="flex:1;">
+          <div class="feedback-meta">
+            <strong>{{ f.service_name }}</strong>
+            <span>— {{ f.author }}</span>
+            <span class="rating">⭐ {{ f.rating }}/5</span>
+            <time class="date">{{ f.created_at }}</time>
+          </div>
+          <p style="margin:8px 0 0;white-space:pre-wrap;">{{ f.content }}</p>
+        </div>
+        <form method="post" action="/admin/feedback/{{ f.id }}/delete">
+          <button class="btn" type="submit">Удалить</button>
+        </form>
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+</section>
+{% endblock %}
+
+
