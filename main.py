@@ -32,6 +32,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS services (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            name_lower TEXT,
             description TEXT DEFAULT '',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
@@ -57,6 +58,13 @@ def init_db():
         conn.commit()
     except sqlite3.OperationalError:
         pass  # Column already exists
+    # Add name_lower column if missing and backfill
+    try:
+        cur.execute("ALTER TABLE services ADD COLUMN name_lower TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    cur.execute("UPDATE services SET name_lower = lower(name) WHERE name_lower IS NULL")
     conn.commit()
     conn.close()
 
@@ -207,8 +215,8 @@ def services_page(request: Request, search: Optional[str] = None, min_rating: Op
         """
         params = []
         if search:
-            query += " AND s.name LIKE ?"
-            params.append(f"%{search}%")
+            query += " AND s.name_lower LIKE ?"
+            params.append(f"%{search.casefold()}%")
         if parsed_min_rating is not None:
             query += " GROUP BY s.id, s.name, s.description HAVING avg_rating >= ?"
             params.append(parsed_min_rating)
@@ -301,10 +309,16 @@ def admin_create_service(payload: ServiceCreate):
     cur.execute(
         (
             "INSERT INTO services("
-            "name, description, created_at, updated_at"
-            ") VALUES (?, ?, ?, ?)"
+            "name, name_lower, description, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?)"
         ),
-        (payload.name.strip(), (payload.description or "").strip(), now, now),
+        (
+            payload.name.strip(),
+            payload.name.strip().casefold(),
+            (payload.description or "").strip(),
+            now,
+            now,
+        ),
     )
     conn.commit()
     new_id = cur.lastrowid
@@ -339,10 +353,10 @@ def admin_update_service(service_id: int, payload: ServiceUpdate):
     now = datetime.datetime.utcnow().isoformat()
     conn.execute(
         (
-            "UPDATE services SET name = ?, description = ?, "
+            "UPDATE services SET name = ?, name_lower = ?, description = ?, "
             "updated_at = ? WHERE id = ?"
         ),
-        (name, description, now, service_id),
+        (name, name.casefold(), description, now, service_id),
     )
     conn.commit()
     conn.close()
